@@ -16,6 +16,13 @@ from viam.services.vision import VisionClient
 robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
 time_between_speaking = 10
+phrases = [
+    "welcome to the party!",
+    "oh, you scared me!",
+    "ah, what a pleasure to see you, I hope you never leave!",
+    "beware, this is a party you may never depart from",
+    "oh my, be careful here tonight!"
+]
 
 class robot_resources:
     robot = None
@@ -58,7 +65,8 @@ async def detect_and_talk():
             asyncio.ensure_future(track_face(frame, detections[0]))
             asyncio.ensure_future(reach_if_close(frame, detections[0]))
             if (time.time() - robot_status.last_spoke) > time_between_speaking:
-                text = await robot_resources.speech.completion("Give me a quote one might say if they were saying 'Welcome to the party!'", False)
+                phrase = random.choice(phrases)
+                text = await robot_resources.speech.completion("Give me a quote one might say if they were saying '" + phrase + "'", False)
                 print(f"The robot said '{text}'")
                 robot_status.last_spoke = time.time()
 
