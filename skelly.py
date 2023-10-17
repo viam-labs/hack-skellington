@@ -55,11 +55,22 @@ async def detect_and_talk():
         frame = await robot_resources.camera.get_image()   
         detections = await robot_resources.face_detector.get_detections(frame)
         if len(detections) == 1:
-            await track_face(frame, detections[0])
+            asyncio.ensure_future(track_face(frame, detections[0]))
+            asyncio.ensure_future(reach_if_close(frame, detections[0]))
             if (time.time() - robot_status.last_spoke) > time_between_speaking:
                 text = await robot_resources.speech.completion("Give me a quote one might say if they were saying 'Welcome to the party!'", False)
                 print(f"The robot said '{text}'")
                 robot_status.last_spoke = time.time()
+
+async def reach_if_close(im, detection):
+    closeness = (detection.x_max-detection.x_min)/im.size[0]
+    print(closeness)
+    if closeness < .20 and closeness >= .15:
+        await robot_resources.arm.move(50)
+        time.sleep(.1)
+    else:
+        await robot_resources.arm.move(1)
+        time.sleep(.1)
 
 async def track_face(im, detection):
     # offset a bit since the camera eye is on one side of the head
@@ -69,7 +80,6 @@ async def track_face(im, detection):
     # how many degrees (positive or negative) to move out of a max move size of 10
     move_degs = (1 - face_pos * 2) * 10
     new_position = int(await robot_resources.head.get_position() + move_degs)
-    print(face_pos)
     if new_position > 180:
         new_position = 180
     elif new_position < 0:
