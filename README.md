@@ -1,2 +1,2 @@
-# tutorial-skelly
-Tutorial code for ML/AI powered halloween skeleton
+# hack-skellington
+Project code for ML/AI powered halloween skeleton
