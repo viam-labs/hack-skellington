@@ -61,11 +61,15 @@ async def detect_and_talk():
     while True:
         frame = await robot_resources.camera.get_image()   
         detections = await robot_resources.face_detector.get_detections(frame)
+
         if len(detections) == 1:
+            print(detections)
             asyncio.ensure_future(track_face(frame, detections[0]))
             asyncio.ensure_future(reach_if_close(frame, detections[0]))
             if (time.time() - robot_status.last_spoke) > time_between_speaking:
                 phrase = random.choice(phrases)
+                if detections[0].class_name != 'face':
+                    phrase = detections[0].class_name + " " + phrase
                 text = await robot_resources.speech.completion("Give me a quote one might say if they were saying '" + phrase + "'", False)
                 print(f"The robot said '{text}'")
                 robot_status.last_spoke = time.time()
