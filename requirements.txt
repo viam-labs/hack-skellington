@@ -1,3 +1,8 @@
 speech @ git+https://github.com/viam-labs/speech.git@main
 viam-sdk
 pillow
+pygame
+elevenlabs
+gtts
+openai
+speechrecognition
