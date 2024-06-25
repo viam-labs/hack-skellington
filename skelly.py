@@ -13,7 +13,8 @@ from viam.components.servo import Servo
 from viam.services.vision import VisionClient
 
 # these must be set, you can get them from your robot's 'CODE SAMPLE' tab
-robot_secret = os.getenv('ROBOT_SECRET') or ''
+robot_api_key = os.getenv('ROBOT_API_KEY') or ''
+robot_api_key_id = os.getenv('ROBOT_API_KEY_ID') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
 time_between_speaking = 10
 phrases = [
@@ -38,10 +39,12 @@ class robot_status:
     last_spoke: time.time()
 
 async def connect():
-    creds = Credentials(type="robot-location-secret", payload=robot_secret)
-    opts = RobotClient.Options(refresh_interval=0, dial_options=DialOptions(credentials=creds), log_level=logging.DEBUG)
+    opts = RobotClient.Options.with_api_key( 
+        api_key=robot_api_key,
+        api_key_id=robot_api_key_id
+    )
     return await RobotClient.at_address(robot_address, opts)
-
+                                        
 async def move_jaw_when_speaking():
     while True:
         is_speaking = await robot_resources.speech.is_speaking()
